@@ -48,6 +48,44 @@ st.markdown("This is markdown showing **bold** and *italics*")
 
 import streamlit as st
 import datetime as dt # moved all imports to the top
+from PIL import Image
+
+# st.image('app-banner.png')
+image = Image.open('app-banner.png')
+st.image(image, caption='prediction')
+
+
+# Download the  image
+def convert_image(img):
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    byte_im = buf.getvalue()
+    return byte_im
+
+
+def fix_image(upload):
+    image = Image.open(upload)
+    col1.write("Original Image :camera:")
+    col1.image(image)
+
+    fixed = remove(image)
+    col2.write("Fixed Image :wrench:")
+    col2.image(fixed)
+    st.sidebar.markdown("\n")
+    st.sidebar.download_button("Download fixed image", convert_image(fixed), "fixed.png", "image/png")
+
+
+col1, col2 = st.columns(2)
+my_upload = st.sidebar.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+
+if my_upload is not None:
+    if my_upload.size > MAX_FILE_SIZE:
+        st.error("The uploaded file is too large. Please upload an image smaller than 5MB.")
+    else:
+        fix_image(upload=my_upload)
+else:
+    fix_image("./zebra.jpg")
+
 st.title('Hello, Streamlit!')
 # Get the name
 name = st.text_input("First Name",value="Streamlit")
